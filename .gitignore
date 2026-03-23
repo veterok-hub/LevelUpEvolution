@@ -14,3 +14,8 @@ project.lock.json
 project.assets.json
 *.nuget.props
 *.nuget.targets
+
+    node_modules/
+    dist/
+    .eslintcache
+    

@@ -1,41 +1,38 @@
+using LevelUp.Api.Models; // Добавил эту строчку, чтобы наш контроллер знал о Character и UserTask
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Добавляем сервисы для твоего API
+builder.Services.AddControllers(); // Это критично для работы твоих контроллеров (CharacterController)
+builder.Services.AddEndpointsApiExplorer(); // Нужно для Swagger
+builder.Services.AddSwaggerGen(); // Включаем генератор Swagger документации
+
+// Настройка CORS (чтобы фронтенд мог общаться с бэкендом)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.AllowAnyOrigin() // Разрешаем запросы с любого адреса (пока что, потом ограничим)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Конфигурируем HTTP запрос
+// Мы ВЫНОСИМ Swagger ИЗ if (app.Environment.IsDevelopment()), чтобы он работал всегда
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseCors(); // Добавляем CORS-политику
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseAuthorization();
+
+app.MapControllers(); // Это КРИТИЧНО - говорит серверу "найди все контроллеры и используй их"
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

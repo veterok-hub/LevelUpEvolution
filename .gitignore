@@ -1,0 +1,16 @@
+# Игнорируем временные файлы .NET
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docuser
+
+# Игнорируем настройки Visual Studio
+.vs/
+.vscode/
+
+# Игнорируем файлы зависимостей
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
